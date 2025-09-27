@@ -33,7 +33,7 @@ jobs:
         version: 10.11.1
     
     - name: Install dependencies
-      run: pnpm ci
+      run: pnpm install --frozen-lockfile
     
     - name: Run Liniting
       run: pnpm run lint
