@@ -1,0 +1,42 @@
+name: Talk-point ci
+
+on:
+  push:
+    paths:
+      - 'backend/**'
+    branches: [ dev ]
+  pull_request:
+    paths:
+      - 'backend/**'
+    branches: [ dev ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: ['lts/*']
+      
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'pnpm'
+    
+    - name: setup pnpm
+      uses: pnpm/action-setup@v2
+      with:
+        version: 10.11.1
+    
+    - name: Install dependencies
+      run: pnpm ci
+    
+    - name: Run Liniting
+      run: pnpm run lint
+
+    - name: Build Project
+      run: pnpm run build
