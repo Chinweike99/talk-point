@@ -4,11 +4,11 @@ on:
   push:
     paths:
       - 'backend/**'
-    branches: [ dev ]
+    branches: [ staging ]
   pull_request:
     paths:
       - 'backend/**'
-    branches: [ dev ]
+    branches: [ staging ]
 
 jobs:
   build:
