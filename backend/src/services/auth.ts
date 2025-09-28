@@ -37,7 +37,7 @@ export const registerUser = async (email: string, username: string, password: st
 }
 
 
-export const login = async(email: string, password: string) => {
+export const loginUser = async(email: string, password: string) => {
     const existingUser = await prisma.user.findUnique({where: {email}});
     if(!existingUser){
         throw new Error("User does not exist, create an account to continue")
