@@ -1,3 +1,5 @@
+import { Request } from "express";
+
 export type User = {
   id: string;
   email: string;
@@ -32,13 +34,13 @@ export type Message = {
   createdAt: Date;
 };
 
-export type AuthRequest = {
+export type AuthRequest = Request & {
   user: {
     id: string;
     email: string;
     role: string;
   };
-} & Express.Request;
+} ;
 
 export type SocketAuth = {
   userId: string;
