@@ -27,3 +27,16 @@ export const authenticateToken = (req: AuthRequest, res: Response, next: NextFun
 };
 
 
+export const adminAccess = (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        if(req.user.role !== "ADMIN"){
+            res.status(403).json({
+                error: "Admin access is required"
+            })
+        }
+        next();
+    } catch (error) {
+        throw Error("Only Admin can access this route")
+    }
+}
+
