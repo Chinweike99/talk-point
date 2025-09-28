@@ -28,9 +28,11 @@ jobs:
         version: 10.11.1
 
     - name: Install dependencies
+      working-directory: ./backend
       run: pnpm install --frozen-lockfile
     
     - name: Build project
+      working-directory: ./backend
       run: pnpm run build
 
     - name: Archive production artifacts
