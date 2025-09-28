@@ -22,7 +22,7 @@ export const verifyToken = (token: string): any => {
 //   return result;
 // };
 
-export function excludeFieldsFast<T extends Record<string, unknown>, K extends keyof T>(
+export function excludeFields<T extends Record<string, unknown>, K extends keyof T>(
   obj: T,
   keys: readonly K[]
 ): Omit<T, K> {

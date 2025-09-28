@@ -62,8 +62,8 @@ model Message {
   imageUrl    String?
   messageType MessageType @default(TEXT)
   senderId    String
-  receiverId  String?  // For direct messages
-  roomId      String?  // For room messages
+  receiverId  String?
+  roomId      String?
   isRead      Boolean  @default(false)
   createdAt   DateTime @default(now())
 
