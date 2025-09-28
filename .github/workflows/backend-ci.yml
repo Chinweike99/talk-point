@@ -1,4 +1,4 @@
-name: Talk-point ci
+name: Talk-point CI
 
 on:
   push:
@@ -25,16 +25,17 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
-    
-    - name: setup pnpm
+
+    - name: Setup pnpm
       uses: pnpm/action-setup@v2
       with:
         version: 10.11.1
-    
+        run_install: false   # don’t auto-install here, we’ll do it explicitly
+
     - name: Install dependencies
       run: pnpm install --frozen-lockfile
     
-    - name: Run Liniting
+    - name: Run Linting
       run: pnpm run lint
 
     - name: Build Project
