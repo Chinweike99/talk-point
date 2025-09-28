@@ -1,14 +1,9 @@
-import { Response } from "express";
+import { Response, Request } from "express";
 import { getAdminProfile, getAllUsers, getUserById } from "../services/user"
-import { AuthRequest } from "../types"
 
-
-
-
-
-export const getUsers = async(req: AuthRequest, res: Response) => {
+export const getUsers = async(req: Request, res: Response) => {
     try {
-        if(req.user.role !== 'ADMIN'){
+        if(req.user?.role !== 'ADMIN'){
             return res.status(403).json({
                 error: "Admin access required"
             })
@@ -21,12 +16,12 @@ export const getUsers = async(req: AuthRequest, res: Response) => {
 }
 
 
-export const getUserProfile = async(req: AuthRequest, res: Response) => {
+export const getUserProfile = async(req: Request, res: Response) => {
     try {
         const userId = req.params.id;
         const user = await getUserById(userId);
 
-        if(req.user.role !== 'ADMIN' && user.role !== 'ADMIN'){
+        if(req.user?.role !== 'ADMIN' && user.role !== 'ADMIN'){
             return res.status(403).json({ error: 'Can only view admin profile' });
         };
         res.json(user)
@@ -36,16 +31,16 @@ export const getUserProfile = async(req: AuthRequest, res: Response) => {
 }
 
 
-export const getMyProfile = async(req: AuthRequest, res: Response) => {
+export const getMyProfile = async(req: Request, res: Response) => {
     try {
-        const user = await getUserById(req.user.id);
+        const user = await getUserById(req.user?.id as any);
         res.json(user)
     } catch (error) {
         res.status(404).json({ error: (error as Error).message });
     }
 }
 
-export const getAdmin = async(req: AuthRequest, res: Response) => {
+export const getAdmin = async(req: Request, res: Response) => {
     try {
         const admin = await getAdminProfile();
         res.json(admin)

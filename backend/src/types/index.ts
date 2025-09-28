@@ -34,13 +34,13 @@ export type Message = {
   createdAt: Date;
 };
 
-export type AuthRequest = Request & {
-  user: {
-    id: string;
-    email: string;
-    role: string;
-  };
-} ;
+// export type Request = Request & {
+//   user: {
+//     id: string;
+//     email: string;
+//     role: string;
+//   };
+// } ;
 
 export type SocketAuth = {
   userId: string;

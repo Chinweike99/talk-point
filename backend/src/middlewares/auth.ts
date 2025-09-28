@@ -1,10 +1,10 @@
-import { NextFunction,  Response } from "express";
+import { NextFunction,  Request,  Response } from "express";
 import { verifyToken } from "../utils/helpers";
-import { AuthRequest } from "../types";
 
 
 
-export const authenticateToken = (req: AuthRequest, res: Response, next: NextFunction) => {
+
+export const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
     try {
         const authHeader = req.headers.authorization;
         const token = authHeader && authHeader.split(' ')[1];
@@ -22,14 +22,15 @@ export const authenticateToken = (req: AuthRequest, res: Response, next: NextFun
         next();
 
     } catch (error) {
-        throw new Error("Unable to Authenticate token")
+        // throw new Error("Unable to Authenticate token")
+        return error
     }
 };
 
 
-export const adminAccess = (req: AuthRequest, res: Response, next: NextFunction) => {
+export const adminAccess = (req: Request, res: Response, next: NextFunction) => {
     try {
-        if(req.user.role !== "ADMIN"){
+        if(req.user?.role  !== "ADMIN"){
             res.status(403).json({
                 error: "Admin access is required"
             })
