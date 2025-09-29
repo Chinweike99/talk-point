@@ -20,7 +20,7 @@ export const connectRabbitMQ = async() =>{
     }
 };
 
-export const sendToQueue = async(queue: string, message: Message) => {
+export const sendToQueue = async(queue: string, message: any) => {
     try {
         channel.sendToQueue(queue, Buffer.from(JSON.stringify(message)), {
             persistent: true
@@ -31,7 +31,7 @@ export const sendToQueue = async(queue: string, message: Message) => {
 }
 
 
-export const consumeFromQueue = async(queue: string, cb: (message: Message)=>void) =>{
+export const consumeFromQueue = async(queue: string, cb: (message: any)=>void) =>{
     try {
         channel.consume(queue, (msg: Message) => {
             if(msg !== null){
