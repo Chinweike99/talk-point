@@ -1,13 +1,14 @@
-import amqp from 'amqplib'
+// import amqp from 'amqplib'
 import { Message } from '../types';
+import amqp, { Connection, Channel, ConsumeMessage } from "amqplib";
 
-let connection: amqp.Connection;
-let channel: amqp.Channel | any;
+let connection: Connection | any;
+let channel: Channel;
 
 export const connectRabbitMQ = async() =>{
     try {
-        const connection = await amqp.connect(process.env.RABBITMQ_URL!);
-        const channel = await connection.createChannel();
+         connection = await amqp.connect(process.env.RABBITMQ_URL!);
+         channel = await connection.createChannel();
 
         // Assert queues
         await channel.assertQueue('message_queue', { durable: true });
@@ -33,7 +34,8 @@ export const sendToQueue = async(queue: string, message: any) => {
 
 export const consumeFromQueue = async(queue: string, cb: (message: any)=>void) =>{
     try {
-        channel.consume(queue, (msg: Message) => {
+        
+        channel.consume(queue, (msg: ConsumeMessage | null) => {
             if(msg !== null){
                 const content = JSON.parse(msg.content.toString());
                 cb(content);
