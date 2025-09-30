@@ -35,10 +35,16 @@ importers:
       socket.io:
         specifier: ^4.7.5
         version: 4.8.1
+      zod:
+        specifier: ^4.1.11
+        version: 4.1.11
     devDependencies:
       '@eslint/js':
         specifier: ^9.36.0
         version: 9.36.0
+      '@types/amqplib':
+        specifier: ^0.10.7
+        version: 0.10.7
       '@types/cors':
         specifier: ^2.8.17
         version: 2.8.19
@@ -336,6 +342,9 @@ packages:
 
   '@socket.io/component-emitter@3.1.2':
     resolution: {integrity: sha512-9BCxFwvbGg/RsZK9tjXd8s4UcwR0MWeFQ1XEKIQVVvAGJyINdrqKMcTRyLoK8Rse1GjzLV9cwjWV1olXRWEXVA==}
+
+  '@types/amqplib@0.10.7':
+    resolution: {integrity: sha512-IVj3avf9AQd2nXCx0PGk/OYq7VmHiyNxWFSb5HhU9ATh+i+gHWvVcljFTcTWQ/dyHJCTrzCixde+r/asL2ErDA==}
 
   '@types/body-parser@1.19.6':
     resolution: {integrity: sha512-HLFeCYgz89uk22N5Qg3dvGvsv46B8GLvKKo1zKG4NybA8U2DiEO3w9lqGg29t/tfLRJpJ6iQxnVw4OnB7MoM9g==}
@@ -1295,6 +1304,9 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
 
+  zod@4.1.11:
+    resolution: {integrity: sha512-WPsqwxITS2tzx1bzhIKsEs19ABD5vmCVa4xBo2tq/SrV4RNZtfws1EnCWQXM6yh8bD08a1idvkB5MZSBiZsjwg==}
+
 snapshots:
 
   '@epic-web/invariant@1.0.0': {}
@@ -1472,6 +1484,10 @@ snapshots:
       '@prisma/debug': 5.22.0
 
   '@socket.io/component-emitter@3.1.2': {}
+
+  '@types/amqplib@0.10.7':
+    dependencies:
+      '@types/node': 20.19.17
 
   '@types/body-parser@1.19.6':
     dependencies:
@@ -2534,3 +2550,5 @@ snapshots:
   xtend@4.0.2: {}
 
   yocto-queue@0.1.0: {}
+
+  zod@4.1.11: {}
