@@ -8,70 +8,92 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  username  String   @unique
-  password  String
-  role      UserRole @default(USER)
-  avatar    String?
-  isOnline  Boolean  @default(false)
-  lastSeen  DateTime @default(now())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  sentMessages     Message[] @relation("MessageSender")
-  receivedMessages Message[] @relation("MessageReceiver")
-  roomMemberships  RoomMember[]
-  createdRooms     Room[]
+  id                String              @id @default(cuid())
+  email             String              @unique
+  username          String              @unique
+  password          String
+  role              UserRole            @default(USER)
+  avatar            String?
+  isOnline          Boolean             @default(false)
+  lastSeen          DateTime            @default(now())
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  message_reactions message_reactions[]
+  receivedMessages  Message[]           @relation("MessageReceiver")
+  sentMessages      Message[]           @relation("MessageSender")
+  notifications     notifications[]
+  roomMemberships   RoomMember[]
+  createdRooms      Room[]
 
   @@map("users")
 }
 
 model Room {
-  id          String   @id @default(cuid())
-  name        String   @unique
+  id          String       @id @default(cuid())
+  name        String       @unique
   description String?
-  isPublic    Boolean  @default(true)
+  isPublic    Boolean      @default(true)
   createdBy   String
-  creator     User     @relation(fields: [createdBy], references: [id], onDelete: Cascade)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  members RoomMember[]
-  messages Message[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  messages    Message[]
+  members     RoomMember[]
+  creator     User         @relation(fields: [createdBy], references: [id], onDelete: Cascade)
 
   @@map("rooms")
 }
 
 model RoomMember {
-  id     String @id @default(cuid())
+  id     String   @id @default(cuid())
   userId String
   roomId String
   role   RoomRole @default(MEMBER)
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  room Room @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  room   Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  user   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, roomId])
   @@map("room_members")
 }
 
 model Message {
-  id          String   @id @default(cuid())
-  content     String
-  imageUrl    String?
-  messageType MessageType @default(TEXT)
-  senderId    String
-  receiverId  String?
-  roomId      String?
-  isRead      Boolean  @default(false)
-  createdAt   DateTime @default(now())
-
-  sender   User  @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
-  receiver User? @relation("MessageReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
-  room     Room? @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  id                String              @id @default(cuid())
+  content           String
+  imageUrl          String?
+  messageType       MessageType         @default(TEXT)
+  senderId          String
+  receiverId        String?
+  roomId            String?
+  isRead            Boolean             @default(false)
+  createdAt         DateTime            @default(now())
+  message_reactions message_reactions[]
+  receiver          User?               @relation("MessageReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  room              Room?               @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  sender            User                @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
 
   @@map("messages")
+}
+
+model message_reactions {
+  id         String    @id
+  message_id String
+  user_id    String
+  emoji      String
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  messages   Message   @relation(fields: [message_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_message_reactions_message")
+  users      User      @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_message_reactions_user")
+
+  @@unique([message_id, user_id, emoji], map: "uq_message_reactions")
+}
+
+model notifications {
+  id         String    @id
+  user_id    String
+  type       String
+  data       String
+  is_read    Boolean?  @default(false)
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  updated_at DateTime? @default(now()) @db.Timestamp(6)
+  users      User      @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_notifications_user")
 }
 
 enum UserRole {
