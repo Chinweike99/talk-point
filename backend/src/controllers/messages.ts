@@ -13,7 +13,6 @@ export const sendMessageHandler = async(req: Request, res: Response) => {
     }
 }
 
-
 export const getRoomMessagesHandler = async(req: Request, res: Response) => {
     try {
         const user = req.user?.id as string
@@ -22,8 +21,9 @@ export const getRoomMessagesHandler = async(req: Request, res: Response) => {
         const limit = parseInt(req.query.limit as string) || 50;
 
         const result = await getRoomMessages(roomId, user, page, limit)
+        res.json(result)
     } catch (error) {
-        
+        res.status(400).json({ error: (error as Error).message });
     }
 }
 

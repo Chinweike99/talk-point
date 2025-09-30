@@ -2,7 +2,8 @@ import prisma from "../config/database"
 
 
 
-export const creatRoom = async (name: string, description: string, isPublic: boolean, createdBy: string) => {
+export const creatRoom = async (name: string, description: string, isPublic: boolean, createdBy: string,) => {
+  
     const existingRoom = await prisma.room.findUnique({where: {name}});
 
     if(existingRoom){
