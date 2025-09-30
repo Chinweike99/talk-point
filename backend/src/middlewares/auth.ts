@@ -37,6 +37,7 @@ export const adminAccess = (req: Request, res: Response, next: NextFunction) => 
         }
         next();
     } catch (error) {
+        console.log(error)
         throw Error("Only Admin can access this route")
     }
 }

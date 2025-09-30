@@ -12,7 +12,7 @@ const storage = multer.diskStorage({
         cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname))
     }
 });
-
+// eslint-disable-next-line no-undef
 const fileFilter = (req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
     const allowedTypes = ["image/jpeg", "image/png", "image/gif", "application/pdf"];
     if(allowedTypes.includes(file.mimetype)){

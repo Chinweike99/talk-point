@@ -12,6 +12,7 @@ export const isAdmin = (req: Request, res: Response, next: NextFunction) => {
 
     next();
   } catch (error) {
+    console.log(error)
     res.status(500).json({ error: "Internal server error" });
   }
 };

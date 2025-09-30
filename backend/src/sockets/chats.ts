@@ -36,6 +36,7 @@ export const setupSocketIO = (io: SocketIOServer) => {
             next()
 
         } catch (error) {
+            console.log(error)
             next(new Error('Authentication error'));
         }
     });
@@ -79,6 +80,7 @@ export const setupSocketIO = (io: SocketIOServer) => {
                     })
                 }
             } catch (error) {
+                console.log(error)
                 socket.emit('error', { message: 'Failed to join room' });
 
             }
@@ -147,6 +149,7 @@ export const setupSocketIO = (io: SocketIOServer) => {
                 })
 
             } catch (error) {
+                console.log(error)
                 socket.emit('error', { message: 'Failed to send message' });
             }
         });
@@ -206,6 +209,7 @@ export const setupSocketIO = (io: SocketIOServer) => {
             })
 
             } catch (error) {
+                console.log(error)
                 socket.emit('error', { message: 'Failed to send message' });
             }
         });

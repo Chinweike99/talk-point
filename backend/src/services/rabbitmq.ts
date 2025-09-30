@@ -1,5 +1,3 @@
-// import amqp from 'amqplib'
-import { Message } from '../types';
 import amqp, { Connection, Channel, ConsumeMessage } from "amqplib";
 
 let connection: Connection | any;
