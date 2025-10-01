@@ -86,7 +86,7 @@ model message_reactions {
 }
 
 model notifications {
-  id         String    @id
+  id         String    @id  @default(cuid())
   user_id    String
   type       String
   data       String
