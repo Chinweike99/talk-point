@@ -74,7 +74,7 @@ model Message {
 }
 
 model message_reactions {
-  id         String    @id
+  id         String    @id  @default(cuid())
   message_id String
   user_id    String
   emoji      String

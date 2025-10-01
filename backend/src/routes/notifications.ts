@@ -1,4 +1,3 @@
-// src/routes/notifications.ts
 import { Router } from 'express';
 import { 
   getNotificationsHandler, 
