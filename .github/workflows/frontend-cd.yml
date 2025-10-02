@@ -3,7 +3,7 @@ name: Talk-point frontend CD
 on:
   push:
     paths:
-      - 'backend/**'
+      - 'frontend/**'
     branches: [ main ]
 
 jobs:
