@@ -13,6 +13,12 @@ import roomRoutes from './routes/rooms';
 import messageRoutes from './routes/messages';
 import { setupSocketIO } from './sockets/chats';
 
+import adminRoutes from './routes/admin';
+import notificationRoutes from './routes/notifications';
+import reactionRoutes from './routes/messageReactions';
+import { setupNotificationConsumer } from './services/notification';
+
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename)
 
@@ -43,6 +49,11 @@ app.use('/api/users', userRoutes);
 app.use('/api/rooms', roomRoutes);
 app.use('/api/messages', messageRoutes);
 
+app.use('/api/admin', adminRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/reactions', reactionRoutes);
+// app.use('/api/search', searchRoutes);
+
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
@@ -57,12 +68,17 @@ const startServer = async () => {
     // Connect to RabbitMQ
     await connectRabbitMQ();
 
+    // Notification consumer setup
+    setupNotificationConsumer();
+
     // Setup Socket.IO after RabbitMQ connection
     setupSocketIO(io);
 
     server.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
       console.log(`Health check: http://localhost:${PORT}/api/health`);
+      console.log(`💬 Socket.IO ready for connections`);
+      console.log(`🐰 RabbitMQ connected and consumers running`);
     });
   } catch (error) {
     console.error('Failed to start server:', error);

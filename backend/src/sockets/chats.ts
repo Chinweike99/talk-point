@@ -250,6 +250,125 @@ export const setupSocketIO = (io: SocketIOServer) => {
       }
     });
 
+
+    socket.on("add_reaction", async(data: {messageId: string; emoji: string}) => {
+        try {
+                const { messageId, emoji } = data;
+
+    const reaction = await prisma.message_reactions.create({
+      data: {
+        message_id: messageId,
+        user_id:  user.userId,
+        emoji
+      },
+      include: {
+        users: {
+          select: {
+            id: true,
+            username: true,
+            avatar: true
+          }
+        },
+        messages: {
+          include: {
+            room: true,
+            receiver: true
+          }
+        }
+      }
+    });
+
+     // Notify relevant users
+    if (reaction.messages.roomId) {
+      io.to(`room_${reaction.messages.roomId}`).emit('reaction_added', reaction);
+    } else if (reaction.messages.receiverId) {
+      // Direct message reaction
+      const participants = [reaction.messages.senderId, reaction.messages.receiverId];
+      participants.forEach(participantId => {
+        const participantSocket = connectedUsers.get(participantId);
+        if (participantSocket) {
+          io.to(participantSocket.socketId).emit('reaction_added', reaction);
+        }
+      });
+    }
+  } catch (error) {
+    console.log(error)
+    socket.emit('error', { message: 'Failed to add reaction' });
+  }
+});
+
+
+socket.on('remove_reaction', async (data: { messageId: string; emoji: string }) => {
+  try {
+    const { messageId, emoji } = data;
+
+    const reaction = await prisma.message_reactions.findFirst({
+      where: {
+        message_id: messageId,
+        user_id: user.userId,
+        emoji
+      },
+      include: {
+        messages: {
+          include: {
+            room: true,
+            receiver: true
+          }
+        }
+      }
+    });
+
+    if (reaction) {
+      await prisma.message_reactions.delete({
+        where: { id: reaction.id }
+      });
+
+      // Notify relevant users
+      if (reaction.messages.roomId) {
+        io.to(`room_${reaction.messages.roomId}`).emit('reaction_removed', {
+          messageId,
+          emoji,
+          userId: user.userId
+        });
+      } else if (reaction.messages.receiverId) {
+        const participants = [reaction.messages.senderId, reaction.messages.receiverId];
+        participants.forEach(participantId => {
+          const participantSocket = connectedUsers.get(participantId);
+          if (participantSocket) {
+            io.to(participantSocket.socketId).emit('reaction_removed', {
+              messageId,
+              emoji,
+              userId: user.userId
+            });
+          }
+        });
+      }
+    }
+  } catch (error) {
+    console.log(error)
+    socket.emit('error', { message: 'Failed to remove reaction' });
+  }
+});
+
+// Notification events
+socket.on('mark_notification_read', async (notificationId: string) => {
+  try {
+    await prisma.notifications.update({
+      where: {
+        id: notificationId,
+        user_id: user.userId
+      },
+      data: { is_read: true }
+    });
+
+    socket.emit('notification_marked_read', { notificationId });
+  } catch (error) {
+    console.log(error)
+    socket.emit('error', { message: 'Failed to mark notification as read' });
+  }
+});
+
+
     // Handle disconnection
     socket.on('disconnect', ()=> {
         console.log(`User ${user.username} disconnected`);
@@ -286,7 +405,6 @@ export const setupSocketIO = (io: SocketIOServer) => {
             console.error('Error processing message from queue:', error);
         }
     })
-
 
 }
 
