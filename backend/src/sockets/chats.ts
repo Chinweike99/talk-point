@@ -292,6 +292,7 @@ export const setupSocketIO = (io: SocketIOServer) => {
       });
     }
   } catch (error) {
+    console.log(error)
     socket.emit('error', { message: 'Failed to add reaction' });
   }
 });
@@ -344,6 +345,7 @@ socket.on('remove_reaction', async (data: { messageId: string; emoji: string }) 
       }
     }
   } catch (error) {
+    console.log(error)
     socket.emit('error', { message: 'Failed to remove reaction' });
   }
 });
@@ -361,6 +363,7 @@ socket.on('mark_notification_read', async (notificationId: string) => {
 
     socket.emit('notification_marked_read', { notificationId });
   } catch (error) {
+    console.log(error)
     socket.emit('error', { message: 'Failed to mark notification as read' });
   }
 });

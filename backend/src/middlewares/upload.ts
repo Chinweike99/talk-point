@@ -1,8 +1,6 @@
 import { Request } from "express";
 import multer from "multer";
 import path from "path";
-import prisma from "../config/database";
-import { sendToQueue } from "../services/rabbitmq";
 
 
 const storage = multer.diskStorage({

@@ -101,7 +101,7 @@ const notificationTemplates = {
   }),
   MESSAGE_DELETED: (data: any) => ({
     title: 'Message Removed',
-    message: 'One of your messages was removed by an administrator',
+    message: `One of your messages was removed by an administrator${data}`,
     action: '/guidelines',
     priority: 'normal'
   })
