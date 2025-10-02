@@ -1,4 +1,4 @@
-name: Talk-point CI
+name: Talk-point frontend CI
 
 on:
   push:
