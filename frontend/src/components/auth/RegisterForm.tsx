@@ -14,8 +14,8 @@ interface RegisterFormProps {
 export const RegisterForm: React.FC<RegisterFormProps> = ({onToggleMode}) => {
 
     const [formData, setFormData] = useState({
-        username: '',
         email: '',
+        username: '',
         password: '',
         confirmPassword: ''
     });
@@ -43,7 +43,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({onToggleMode}) => {
         }
 
         try {
-            const response = await authAPI.register(formData.username, formData.email, formData.password);
+            const response = await authAPI.register(formData.email, formData.username, formData.password);
             login(response.data.user, response.data.token)
         } catch (error: any) {
             setError(error.response?.data?.error || 'Registration failed')
