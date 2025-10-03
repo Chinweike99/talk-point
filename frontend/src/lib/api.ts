@@ -39,10 +39,19 @@ api.interceptors.response.use(
 
 // Auth API
 export const authAPI = {
-    getUsers: () => api.get('/users'),
-    getUser: (id: string) => api.get(`/users/${id}`),
-    getMyProfile: () => api.get('/users/me'),
-    getAdmin: () => api.get('/users/admin')
+  login: (email: string, password: string) => 
+    api.post('/auth/login', { email, password }),
+  register: (email: string, username: string, password: string) =>
+    api.post('/auth/register', { email, username, password }),
+  logout: () => api.post('/auth/logout'),
+}
+
+// Users API
+export const usersAPI = {
+  getUsers: () => api.get('/users'),
+  getUser: (id: string) => api.get(`/users/${id}`),
+  getMyProfile: () => api.get('/users/me'),
+  getAdmin: () => api.get('/users/admin'),
 }
 
 // Rooms API
