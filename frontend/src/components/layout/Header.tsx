@@ -25,7 +25,7 @@ export const Header: React.FC = () => {
           <Menu className="h-5 w-5" />
         </button>
         
-        <h1 className="text-xl font-semibold text-gray-900">ChatApp</h1>
+        <h1 className="text-xl font-semibold text-gray-900">talk-point</h1>
         
         {isAdmin && (
           <span className="px-2 py-1 bg-primary-100 text-primary-700 text-sm rounded-full">
