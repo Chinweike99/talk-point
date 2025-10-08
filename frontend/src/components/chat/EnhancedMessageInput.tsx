@@ -16,7 +16,7 @@ export const EnhancedMessageInput: React.FC = () => {
   const [isTyping, setIsTyping] = useState(false)
   const [typingUsers, setTypingUsers] = useState<Set<string>>(new Set())
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const typingTimeoutRef = useRef<NodeJS.Timeout>()
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const { currentRoom, setActiveView } = useChat()
   const { user } = useAuth()
 

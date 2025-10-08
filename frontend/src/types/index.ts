@@ -94,6 +94,7 @@ export type SocketEvents = {
   reaction_removed: (data: any) => void
   
   // Notifications
+  notification: (data: Notification) => void;
   mark_notification_read: (notificationId: string) => void
   notification_marked_read: (data: { notificationId: string }) => void
   
