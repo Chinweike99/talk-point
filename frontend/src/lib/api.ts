@@ -73,7 +73,9 @@ export const messageAPI = {
         api.get(`/messages/room/${roomId}?page=${page}&limit=${limit}`),
     getDirectMessages: (userId: string, page?: number, limit?: number) => 
         api.get(`/messages/direct/${userId}?page=${page}&limit=${limit}`),
-    getConversation: () => api.get('/messages/conversations')
+    getConversation: () => api.get('/messages/conversations'),
+    markAsRead: (data: { messageIds: string[] }) =>
+    api.post('/messages/mark-read', data),
 }
 
 
@@ -92,5 +94,16 @@ export const searchAPI = {
     api.get(`/search/messages?q=${query}${roomId ? `&roomId=${roomId}` : ''}`),
   searchUsers: (query: string) => api.get(`/search/users?q=${query}`),
   searchRooms: (query: string) => api.get(`/search/rooms?q=${query}`),
+}
+
+// Admin API
+export const adminAPI = {
+  getStatistics: () => api.get('/admin/statistics'),
+  getAnalytics: (timeRange?: string) => 
+    api.get(`/admin/analytics?timeRange=${timeRange || '24h'}`),
+  banUser: (userId: string) => api.post(`/admin/ban/${userId}`),
+  unbanUser: (userId: string) => api.post(`/admin/unban/${userId}`),
+  deleteMessage: (messageId: string) => api.delete(`/admin/message/${messageId}`),
+  purgeUserMessages: (userId: string) => api.post(`/admin/purge-messages/${userId}`),
 }
 

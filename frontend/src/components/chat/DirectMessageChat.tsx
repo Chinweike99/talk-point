@@ -111,9 +111,9 @@ export const DirectMessageChat: React.FC<DirectMessageChatProps> = ({ user }) =>
 
     if (unreadMessages.length > 0) {
       try {
-        // await messageAPI.markAsRead({
-        //   messageIds: unreadMessages.map(msg => msg.id)
-        // })
+        await messageAPI.markAsRead({
+          messageIds: unreadMessages.map(msg => msg.id)
+        })
         
         // Update local state
         setMessages(prev =>

@@ -7,11 +7,13 @@ import { Conversation } from '@/types'
 import { messageAPI } from '@/lib/api'
 import { useAuth } from '@/contexts/AuthContext'
 import { cn, formatDate } from '@/lib/utils'
+import { useEnhancedChat } from '@/contexts/EnhancedChatContext'
 
 export const ConversationList: React.FC = () => {
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const { user } = useAuth()
+  const { startDirectMessage } = useEnhancedChat()
 
   useEffect(() => {
     loadConversations()
@@ -28,9 +30,12 @@ export const ConversationList: React.FC = () => {
     }
   }
 
-  const startConversation = (conversation: Conversation) => {
-    // This would open the direct message chat
-    console.log('Open conversation with:', conversation.user.username)
+  // const startConversation = (conversation: Conversation) => {
+  //   // This would open the direct message chat
+  //   console.log('Open conversation with:', conversation.user.username)
+  // }
+  const handleOpenConversation = (conversation: Conversation) => {
+    startDirectMessage(conversation.user)
   }
 
   if (isLoading) {
@@ -56,7 +61,7 @@ export const ConversationList: React.FC = () => {
             transition={{ delay: index * 0.1 }}
           >
             <button
-              onClick={() => startConversation(conversation)}
+              onClick={() => handleOpenConversation(conversation)}
               className="w-full p-3 rounded-lg text-left transition-all hover:bg-gray-50 border-2 border-transparent"
             >
               <div className="flex items-center space-x-3">

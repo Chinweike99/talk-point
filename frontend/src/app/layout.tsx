@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
+// import { ChatProvider } from "@/contexts/ChatContext";
+import { EnhancedChatProvider } from "@/contexts/EnhancedChatContext";
 import { ChatProvider } from "@/contexts/ChatContext";
 
 const geistSans = Geist({
@@ -31,7 +33,9 @@ export default function RootLayout({
       >
         <AuthProvider>
           <ChatProvider>
+          {/* <EnhancedChatProvider> */}
             {children}
+          {/* </EnhancedChatProvider> */}
           </ChatProvider>
         </AuthProvider>
       </body>

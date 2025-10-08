@@ -1,45 +1,122 @@
+
 'use client'
 
-import React, { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { LoginForm } from '@/components/auth/LoginForm'
-import { RegisterForm } from '@/components/auth/RegisterForm'
+import React, { useEffect } from 'react'
+import { motion } from 'framer-motion'
+import { Header } from '@/components/layout/Header'
+import { Sidebar } from '@/components/chat/Sidebar'
+import { MessageList } from '@/components/chat/MessageList'
+import { EnhancedMessageInput } from '@/components/chat/EnhancedMessageInput'
+import { DirectMessageChat } from '@/components/chat/DirectMessageChat'
+import { AdminPanel } from '@/components/admin/AdminPanel'
 import { useAuth } from '@/contexts/AuthContext'
+import { useEnhancedChat } from '@/contexts/EnhancedChatContext'
 import { useRouter } from 'next/navigation'
 
-export default function LoginPage() {
-  const [isLogin, setIsLogin] = useState(true)
+export default function ChatPage() {
   const { user, isLoading } = useAuth()
+  const { 
+    messages, 
+    currentRoom, 
+    currentConversation, 
+    activeView,
+    isAdminPanelOpen 
+  } = useEnhancedChat()
   const router = useRouter()
 
-  useEffect(() => {
-    if (user && !isLoading) {
-      router.push('/chat')
+  // useEffect(() => {
+  //   if (!isLoading && !user) {
+  //     router.push('/login')
+  //   }
+  // }, [user, isLoading, router])
+
+   useEffect(() => {
+    // Only check after loading is complete
+    if (!isLoading) {
+      if (!user) {
+        router.replace('/login') // Use replace instead of push
+      }
     }
   }, [user, isLoading, router])
 
-  if (isLoading || user) {
+  if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
       </div>
     )
   }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center p-4">
-      <div className="text-center mb-8 absolute top-8 left-1/2 transform -translate-x-1/2">
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">ChatApp</h1>
-        <p className="text-gray-600">Real-time messaging with Socket.io and RabbitMQ</p>
-      </div>
+  if (!user) return null
 
-      <AnimatePresence mode="wait">
-        {isLogin ? (
-          <LoginForm key="login" onToggleMode={() => setIsLogin(false)} />
-        ) : (
-          <RegisterForm key="register" onToggleMode={() => setIsLogin(true)} />
-        )}
-      </AnimatePresence>
+  // Render admin panel if open
+  if (isAdminPanelOpen) {
+    return (
+      <div className="h-screen flex flex-col bg-gray-50">
+        <Header />
+        <AdminPanel />
+      </div>
+    )
+  }
+
+  return (
+    <div className="h-screen flex flex-col bg-gray-50">
+      <Header />
+      
+      <div className="flex-1 flex overflow-hidden">
+        <Sidebar />
+        
+        {/* Main Chat Area */}
+        <main className="flex-1 flex flex-col">
+          {currentRoom ? (
+            <>
+              {/* Room Chat Header */}
+              <div className="bg-white border-b border-gray-200 px-6 py-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-xl font-semibold text-gray-900">#{currentRoom.name}</h2>
+                    <p className="text-sm text-gray-500">
+                      {currentRoom.members.length} members • {currentRoom.description}
+                    </p>
+                  </div>
+                  <div className="flex items-center space-x-4 text-sm text-gray-500">
+                    <span>{currentRoom._count?.messages || 0} messages</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Room Messages */}
+              <MessageList messages={messages} />
+
+              {/* Room Message Input */}
+              <EnhancedMessageInput />
+            </>
+          ) : currentConversation ? (
+            /* Direct Message Chat */
+            <DirectMessageChat user={currentConversation} />
+          ) : (
+            /* Empty State */
+            <div className="flex-1 flex items-center justify-center">
+              <div className="text-center">
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="w-24 h-24 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4"
+                >
+                  <div className="text-2xl">💬</div>
+                </motion.div>
+                <h3 className="text-2xl font-semibold text-gray-900 mb-2">Welcome to ChatApp</h3>
+                <p className="text-gray-600 max-w-md mb-6">
+                  {activeView === 'direct' 
+                    ? "Select a conversation from the sidebar or start a new one by messaging a user."
+                    : "Select a room from the sidebar to start chatting, or create a new room to get started."
+                  }
+                </p>
+              </div>
+            </div>
+          )}
+        </main>
+      </div>
     </div>
   )
 }

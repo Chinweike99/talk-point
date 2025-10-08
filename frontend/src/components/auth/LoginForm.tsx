@@ -1,5 +1,4 @@
 "use client";
-
 import { useAuth } from "@/contexts/AuthContext";
 import { authAPI } from "@/lib/api";
 import React, { useState } from 'react'
@@ -32,9 +31,9 @@ export const LoginForm: React.FC<LoginFormProps> = ({onToggleMode}) => {
         }finally{
             setIsLoading(false)
         }
-
     }
-return (
+
+  return (
     <motion.div
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
@@ -42,7 +41,7 @@ return (
       className="w-full max-w-md"
     >
       <div className="bg-white rounded-2xl shadow-xl p-8">
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">Welcome back to talk-point</h2>
+        <h2 className="text-3xl font-bold text-gray-900 mb-2">Welcome back</h2>
         <p className="text-gray-600 mb-8">Sign in to your account</p>
 
         <form onSubmit={handleSubmit} className="space-y-6">

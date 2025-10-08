@@ -155,7 +155,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({onToggleMode}) => {
             type="submit"
             disabled={isLoading}
             className={cn(
-              "w-full bg-primary-500 text-white py-3 px-4 rounded-lg font-medium transition-all",
+              "w-full bg-primary-500 text-blue-500 py-3 px-4 rounded-lg font-medium transition-all",
               "hover:bg-primary-600 focus:ring-2 focus:ring-primary-500 focus:ring-offset-2",
               "disabled:opacity-50 disabled:cursor-not-allowed"
             )}

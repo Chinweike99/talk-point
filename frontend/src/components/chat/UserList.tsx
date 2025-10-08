@@ -1,4 +1,3 @@
-// src/components/chat/UserList.tsx
 'use client'
 
 import React, { useEffect, useState } from 'react'
@@ -9,12 +8,16 @@ import { usersAPI } from '@/lib/api'
 import { useAuth } from '@/contexts/AuthContext'
 import { useChat } from '@/contexts/ChatContext'
 import { cn, formatDate } from '@/lib/utils'
+import { useEnhancedChat } from '@/contexts/EnhancedChatContext'
 
 export const UserList: React.FC = () => {
   const [users, setUsers] = useState<UserType[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const { user: currentUser, isAdmin } = useAuth()
-  const { setActiveView } = useChat()
+  const { setActiveView } = useChat();
+  const { startDirectMessage } = useEnhancedChat()
+
+
 
   useEffect(() => {
     loadUsers()
@@ -37,10 +40,11 @@ export const UserList: React.FC = () => {
     }
   }
 
-  const startDirectMessage = (user: UserType) => {
+  const handleStartDirectMessage = (user: UserType) => {
     // This would set up a direct message conversation
-    console.log('Start DM with:', user.username)
-    setActiveView('direct')
+    // console.log('Start DM with:', user.username)
+    // setActiveView('direct')
+    startDirectMessage(user)
   }
 
   if (isLoading) {
@@ -103,7 +107,7 @@ export const UserList: React.FC = () => {
 
                 {user.id !== currentUser?.id && (
                   <button
-                    onClick={() => startDirectMessage(user)}
+                    onClick={() => handleStartDirectMessage(user)} 
                     className="p-2 text-gray-400 hover:text-primary-600 transition-colors"
                     title="Send message"
                   >

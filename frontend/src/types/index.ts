@@ -9,6 +9,7 @@ export type User = {
   createdAt: string
 }
 
+
 export type Room = {
   id: string
   name: string

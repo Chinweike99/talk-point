@@ -1,8 +1,10 @@
+"use client"
+
 import { Conversation, Message, Notification, Room, User } from "@/types";
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { useAuth } from "./AuthContext";
 import { socketService } from "@/lib/socket";
-import { messageAPI, notificationsAPI } from "@/lib/api";
+import { messageAPI, notificationsAPI, roomsAPI } from "@/lib/api";
 
 
 
@@ -19,6 +21,7 @@ interface EnhancedChatContextType {
     clearMessages: () => void;
     loadMoreMessages: ()=> Promise<void>;
     hasMoreMessages: boolean;
+      startDirectMessage: (user: User) => void;
 
     // Users
     onlineUsers: Set<string>
@@ -52,7 +55,7 @@ interface EnhancedChatContextType {
 const EnhancedChatContext = createContext<EnhancedChatContextType | undefined>(undefined);
 
 export const EnhancedChatProvider: React.FC<{ children: React.ReactNode}> = ({children})=> {
-  const { user, isAdmin } = useAuth()
+  const { user, isAdmin, isLoading } = useAuth()
   const [rooms, setRooms] = useState<Room[]>([])
   const [currentRoom, setCurrentRoom] = useState<Room | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
@@ -68,11 +71,48 @@ export const EnhancedChatProvider: React.FC<{ children: React.ReactNode}> = ({ch
   const [hasMoreMessages, setHasMoreMessages] = useState(true)
 
     useEffect(() => {
+      if (!user) return;
         if(user){
+            loadRooms()
             loadNotifications();
             loadConversations();
         }
-    }, [user]);
+    }, [user, isLoading]);
+
+      const loadRooms = async () => {
+    try {
+      const response = await roomsAPI.getRooms()
+      setRooms(response.data)
+    } catch (error) {
+      console.error('Failed to load rooms:', error)
+    }
+  }
+
+    const startDirectMessage = useCallback((targetUser: User) => {
+    setCurrentConversation(targetUser)
+    setCurrentRoom(null)
+    setMessages([])
+    setActiveView('direct')
+    loadDirectMessages(targetUser.id)
+  }, [])
+
+  const loadDirectMessages = async (userId: string, loadPage: number = 1) => {
+    try {
+      const response = await messageAPI.getDirectMessages(userId, loadPage, 50)
+      const newMessages = response.data.messages
+
+      if (loadPage === 1) {
+        setMessages(newMessages)
+      } else {
+        setMessages(prev => [...prev, ...newMessages])
+      }
+
+      setHasMoreMessages(response.data.pagination.hasNext)
+      setMessagePage(loadPage)
+    } catch (error) {
+      console.error('Failed to load direct messages:', error)
+    }
+  }
 
     // Socket event listeners
     useEffect(() => {
@@ -164,6 +204,16 @@ export const EnhancedChatProvider: React.FC<{ children: React.ReactNode}> = ({ch
             setMessages(prev => [...prev, message])
         }, []);
 
+        //  const startDirectMessage = useCallback((targetUser: User) => {
+        //     setCurrentConversation(targetUser)
+        //     setCurrentRoom(null)
+        //     setMessages([]) 
+        //     setActiveView('direct')
+            
+        //     // Load direct messages for this user
+        //     loadDirectMessages(targetUser.id)
+        // }, []);
+
         const clearMessages = useCallback(() => {
             setMessages([]);
             setMessagePage(1);
@@ -224,6 +274,7 @@ export const EnhancedChatProvider: React.FC<{ children: React.ReactNode}> = ({ch
         }
 const loadNotifications = async () => {
     try {
+      if (!user) return;
       const response = await notificationsAPI.getNotifications()
       setNotifications(response.data.notifications)
     } catch (error) {
@@ -233,6 +284,7 @@ const loadNotifications = async () => {
 
   const loadConversations = async () => {
     try {
+      if (!user) return;
       const response = await messageAPI.getConversation()
       setConversations(response.data)
     } catch (error) {
@@ -240,28 +292,102 @@ const loadNotifications = async () => {
     }
   }
 
+
+
+  //   const loadDirectMessages = async (userId: string, loadPage: number = 1) => {
+  //   try {
+  //     const response = await messageAPI.getDirectMessages(userId, loadPage, 50)
+  //     const newMessages = response.data.messages
+
+  //     if (loadPage === 1) {
+  //       setMessages(newMessages)
+  //     } else {
+  //       setMessages(prev => [...prev, ...newMessages])
+  //     }
+
+  //     setHasMoreMessages(response.data.pagination.hasNext)
+  //     setMessagePage(loadPage)
+  //   } catch (error) {
+  //     console.error('Failed to load direct messages:', error)
+  //   }
+  // }
+
   const unreadCount = notifications.filter(notif => !notif.isRead).length
 
-  return (
+   return (
     <EnhancedChatContext.Provider value={{
       rooms,
       currentRoom,
       setCurrentRoom,
       joinedRooms: rooms.filter(room => room.members.some(member => member.userId === user?.id)),
-      refetchRooms,
+      refetchRooms: loadRooms,
       messages,
-      addMessage,
-      clearMessages,
-      loadMoreMessages,
+      addMessage: useCallback((message: Message) => {
+        setMessages(prev => [...prev, message])
+      }, []),
+      clearMessages: useCallback(() => {
+        setMessages([])
+        setMessagePage(1)
+        setHasMoreMessages(true)
+      }, []),
+      loadMoreMessages: async () => {
+        if (!currentRoom && !currentConversation) return
+        
+        try {
+          const nextPage = messagePage + 1
+          let response
+          
+          if (currentRoom) {
+            response = await messageAPI.getRoomMessages(currentRoom.id, nextPage, 50)
+          } else if (currentConversation) {
+            response = await messageAPI.getDirectMessages(currentConversation.id, nextPage, 50)
+          }
+          
+          if (response) {
+            const newMessages = response.data.messages
+            if (newMessages.length > 0) {
+              setMessages(prev => [...newMessages, ...prev])
+              setMessagePage(nextPage)
+            } else {
+              setHasMoreMessages(false)
+            }
+          }
+        } catch (error) {
+          console.error('Failed to load more messages:', error)
+        }
+      },
       hasMoreMessages,
       onlineUsers,
       typingUsers,
       notifications,
-      unreadCount,
-      addNotification,
-      markAsRead,
-      markAllAsRead,
-      loadNotifications,
+      unreadCount: notifications.filter(notif => !notif.isRead).length,
+      addNotification: useCallback((notification: Notification) => {
+        setNotifications(prev => [notification, ...prev])
+      }, []),
+      markAsRead: useCallback((id: string) => {
+        setNotifications(prev => 
+          prev.map(notif => 
+            notif.id === id ? { ...notif, isRead: true } : notif
+          )
+        )
+        notificationsAPI.markAsRead(id).catch(console.error)
+      }, []),
+      markAllAsRead: async () => {
+        try {
+          await notificationsAPI.markAllAsRead()
+          setNotifications(prev => prev.map(notif => ({ ...notif, isRead: true })))
+        } catch (error) {
+          console.error('Failed to mark all notifications as read:', error)
+        }
+      },
+      loadNotifications: async () => {
+        try {
+          const response = await notificationsAPI.getNotifications()
+          setNotifications(response.data.notifications)
+        } catch (error) {
+          console.error('Failed to load notifications:', error)
+        }
+      },
       conversations,
       currentConversation,
       setCurrentConversation,
@@ -270,7 +396,8 @@ const loadNotifications = async () => {
       activeView,
       setActiveView,
       isAdminPanelOpen: isAdmin && isAdminPanelOpen,
-      setAdminPanelOpen: isAdmin ? setAdminPanelOpen : () => {}
+      setAdminPanelOpen: isAdmin ? setAdminPanelOpen : () => {},
+      startDirectMessage
     }}>
       {children}
     </EnhancedChatContext.Provider>
@@ -284,5 +411,3 @@ export const useEnhancedChat = () => {
   }
   return context
 }
-
-
